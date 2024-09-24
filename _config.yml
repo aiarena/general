@@ -1,0 +1,8 @@
+title: AI Arena Documentation
+logo: images/ai-arena-logo.png
+description: Internal documentation
+
+plugins:
+  - jekyll-remote-theme
+  - jekyll-include-cache
+remote_theme: just-the-docs/just-the-docs@main
