@@ -32,22 +32,40 @@ AI Arena works with the following entities:
 - Website - The website is the frontend to AI Arena. It contains a Web site for users and API endpoints for tools.
 - Database - The database contains the records for bots, authors, games, competitions, rankings, rounds, and matches.
 - Content delivery system - Stores and provides access to the replays and logs of matches.
-- Match controller - Plays requested matches by running 2 bots on 1 game. The client fetches the input match information from the API of the website and feeds the output match information back to the API of the website.
+- Clients - Plays requested matches by running 2 bots on 1 game. The client fetches the input match information from the API of the website and feeds the output match information back to the API.
+    - K8S Controller fetches the queued matches for the configured number of clients. It initializes one Arena Client for a match ensuring there's only one active Arena Client with the same number at any time.
+    - Arena Client runs the match given by the K8S Controller.
+        - Proxy Controller is the main controller in the client. It is responsible for fetching and starting games. It is also an intermediate between the other controllers and the caching server.
+        - SC2 Controller starts the StarCraft II game with the configuration given by the Proxy Controller.
+        - Bot Controller is starts one bot with the configuration given by the Proxy Controller. There are 2 instances of this controller in the client.
+    - Caching Service acts as an intermediate between the client and the Frontend API. It caches the files downloaded from the Frontend API to reduce inbound traffic.
 - Streaming service - Streams match replays for users.
-- Stream component - Converts a replay to the media format of the streaming service and feeds it.
+- Stream - Converts a replay to the media format of the streaming service and feeds it.
 - Wiki - Contains information about AI Arena, the games, competitions and their rules, instructions and guides for bot authors, etc.
 - Patreon service - Used for handling donations from patreons.
 
 # Technologies
 
-* AgroCD - TODO: Verify if AgroCD controls the number of clients
-* AWS - Used as cloud infrastructure for all self-hosted technologies.
+* AgroCD - 
+* AWS - Used as cloud infrastructure for the AI Arena frontend.
 * Docker - 
 * GitHub - Stores the source code for AI Arena.
-* Kubernetes - TODO: Verify if the website and the clients run in the same Kubernetes cluster
+* Hetzner Cloud - Used as cloud infrastructure for the AI Arena clients and stream.
+* Kubernetes - Used for hosting AI Arena Clients.
 * Patreon - Used for the patreon service.
 * PostgreSQL - Used for the database. Version 15. Managed service by AWS.
 * Rancher - Controls the Kubernetes cluster
 * Twitch - Used for the streaming service.
 * Wiki
 
+## Clients
+
+AI Arena Clients run in a Kubernetes cluster controlled by Rancher.
+The source code and configuration is maintained in GitHub at [github.com/aiarena/sc2-ai-match-controller](https://github.com/aiarena/sc2-ai-match-controller) and [github.com/aiarena/AiarenaCachingServer](https://github.com/aiarena/AiarenaCachingServer).
+All components are built as Docker images.
+
+K8S Controller is a Kubernetes **deployment** deployed using a [Kustomize descriptor](https://github.com/aiarena/sc2-ai-match-controller/tree/master/kubernetes). The resulting Kubernetes **pod** fetches the list of queued matches from AI Arena API and starts an Arena Client as Kubernetes **jobs** for each match but only one per configured AI Arena client at a time. On completion of the job, the controller uploads the match result to AI Arena API.
+
+Arena Client is a Kubernetes **job**. The resulting Kubernetes **pod** has 4 containers - a proxy contoller, an SC2 controller, and 2 bot controllers.
+
+Caching Server is a Kubernetes **deployment** deployed manually. It uses the file system of the Docker container to store cached files.
