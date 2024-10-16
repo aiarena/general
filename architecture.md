@@ -46,9 +46,11 @@ AI Arena works with the following entities:
 
 # Technologies
 
-* AgroCD - 
+* AgroCD - Used to update the Kubernetes deployments with the configuration fro GitHub.
 * AWS - Used as cloud infrastructure for the AI Arena frontend.
-* Docker - 
+* AWS Fargate - Used as serverless infrastructure for the AI Arena frontend.
+* Docker - Used to build images for all runtime containers.
+* DockerHub - Stores the Docker images for AI Arena.
 * GitHub - Stores the source code for AI Arena.
 * Hetzner Cloud - Used as cloud infrastructure for the AI Arena clients and stream.
 * Kubernetes - Used for hosting AI Arena Clients.
