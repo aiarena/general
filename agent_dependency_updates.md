@@ -14,10 +14,10 @@ This is a list of steps for how to update the dependencies that agents use in th
 
 These steps will update the [arenaclient-bot-base](https://hub.docker.com/r/aiarena/arenaclient-bot-base) image.
 
-1. Before modifying the base image, bump the BOT_VERSION in the ci [here](https://github.com/aiarena/aiarena-docker-base/blob/master/.github/workflows/ci.yml#L13)
-This will cause the new image to be build under the new version tag.
-2. Modify the Docker.bot file in the [Docker.bot](https://github.com/aiarena/aiarena-docker-base/blob/master/docker/Dockerfile.bot) file with the relevant changes.
-3. Push or PR the changes to master. Once the changes are on master the ci will build the new image and push to docker hub.
+1. Modify the Docker.bot file in the [Docker.bot](https://github.com/aiarena/aiarena-docker-base/blob/master/docker/Dockerfile.bot) file with the relevant changes.
+2. Push or PR the changes to master. Verify the CI test is successful.
+3. Perform a GitHub release, tagged like so: `bot-v#.#.#` where the #'s are replaced with the version numbers. e.g. for version 1.2.3, the tag would be `bot-v1.2.3`
+4. The CI will auto build and release the bot image.
 
 ## Updating the SC2 AI match controller
 
